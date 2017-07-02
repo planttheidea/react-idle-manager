@@ -63,4 +63,4 @@ class App extends PureComponent {
   }
 }
 
-export default idleManager({idleAfter: 15000, timeOutAfter: 5000})(App);
+export default idleManager('planttheidea-idle-manager-demo_App')(App);

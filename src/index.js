@@ -3,7 +3,8 @@ import getWrapComponent from './IdleManager';
 
 // constants
 import {
-  DEFAULT_OPTIONS
+  DEFAULT_OPTIONS,
+  INVALID_OPTIONS_ERROR_MESSAGE
 } from './constants';
 
 // utils
@@ -22,12 +23,15 @@ import {
  * @returns {ReactComponent} the higher-order component that manages session timeouts
  */
 export const idleManager = (options) => {
-  if (typeof options === 'function') {
-    return getWrapComponent(DEFAULT_OPTIONS)(options);
+  if (typeof options === 'string') {
+    return getWrapComponent({
+      ...DEFAULT_OPTIONS,
+      key: options
+    });
   }
 
   if (options && !isPlainObject(options)) {
-    throw new TypeError('If options are passed, they must be a plain object.');
+    throw new TypeError(INVALID_OPTIONS_ERROR_MESSAGE);
   }
 
   return getWrapComponent({

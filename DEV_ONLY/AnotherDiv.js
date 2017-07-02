@@ -7,6 +7,12 @@ import React, {
 // src
 import idleManager from '../src';
 
+const IDLE_MANAGER_OPTIONS = {
+  key: 'planttheidea-idle-manager-demo_AnotherDiv',
+  idleAfter: 7000,
+  timeOutAfter: 3000
+};
+
 class AnotherDiv extends PureComponent {
   static propTypes = {
     children: PropTypes.node,
@@ -49,4 +55,4 @@ class AnotherDiv extends PureComponent {
   }
 }
 
-export default idleManager({idleAfter: 7000, timeOutAfter: 3000})(AnotherDiv);
+export default idleManager(IDLE_MANAGER_OPTIONS)(AnotherDiv);
