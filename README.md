@@ -25,7 +25,7 @@ $ npm i react-idle-manager --save
 
 ## Summary
 
-This decorator wraps whatever `React` component you apply it to with a higher-order component that will supply idle state and timeout state identification to the component via props. It leverages `localStorage` to ensure that the idle state is respected between multiple tab instances, and will handle multiple unique instances based on the `key`s passed.
+This decorator wraps whatever `React` component you apply it to with a higher-order component that will supply idle state and timeout state information to the component via `props`. It leverages `localStorage` to ensure that the idle state is respected between multiple tab instances, and will handle multiple unique instances based on the `key`s passed.
 
 ## Usage
 
@@ -85,7 +85,7 @@ Is the component currently considered timed ONE_MINUTE
 If the component is in an idle state, the number of milliseconds until the component will time out is passed. If the component is not idle, `null` is passed.
 
 This number is updated for every second between the start of idle state and when timeout state is reached, providing a countdown until timeout.
-* The number of milliseconds will not update with exactly 1000 milliseconds (1 second) every time, due to the nature of `setTimeout`. If you want to provide a clean count of the number of seconds, you can simply do `Math.ceil(timeoutIn / 1000)`.
+* The number of milliseconds may not update in exact 1 second intervals, due to the nature of `setTimeout`. If you want to provide a clean count of the number of seconds, you can do `Math.ceil(timeoutIn / 1000)`.
 * If you do not want to provide this timeout, pass the [`timeoutAfter`](#timeoutafter) option value of `0`.
 
 ## Required values
@@ -96,7 +96,7 @@ This number is updated for every second between the start of idle state and when
 
 The key to use in `localStorage` for storage of when idle and timeout states are reached. This value can either be passed as the only parameter to the decorator, or as a property on the object of [options](#options).
 
-Please note that if the same key is used for multiple components, there may be collision of specific time states, so make the keys consistent but specific to each component.
+Please note that if the same key is used for multiple components, there may be collision of specific time states, so make the keys consistent but specific to each implementation.
 
 It is recommended to follow the format `${uniqueAppName}_${componentName}`:
 
@@ -111,7 +111,7 @@ class App extends PureComponent {
 
 #### idleAfter
 
-*number (defaults to 840000, or 14 minutes)*
+*number (defaults to 840000, or 14 minutes in milliseconds)*
 
 The number of milliseconds since activity that the component is considered in idle state.
 
@@ -123,11 +123,11 @@ Should `PureComponent` be used as the basis of the higher-order component the de
 
 #### timeoutAfter
 
-*number (defaults to 60000, or 1 minute)*
+*number (defaults to 60000, or 1 minute in milliseconds)*
 
 The number of milliseconds since idle state was reached that the component is considered in timeout state.
 
-Please note that if a custom `idleAfter` is provided but no custom `timeoutAfter` is provided, timeout is assumed to be 1 minute after the `idleAfter` passed. If you do not want a distinction between idle and timeout state, simply pass `0` as the value for `timeoutAfter`.
+Please note that if a custom `idleAfter` is provided but no custom `timeoutAfter` is provided, timeout is assumed to be 1 minute later than `idleAfter`. If you do not want a distinction between idle and timeout state, simply pass `0` as the value for `timeoutAfter`.
 
 ### Development
 
