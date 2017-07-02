@@ -1,3 +1,3 @@
-# react-idle
+# react-idle-manager
 
-A react component decorator that notifies of idle and timed-out states.
+A decorator for React components that notifies of idle and timed-out states

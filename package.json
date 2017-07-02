@@ -1,0 +1,90 @@
+{
+  "author": "tony.quetano@planttheidea.com",
+  "ava": {
+    "babel": "inherit",
+    "concurrency": 5,
+    "failFast": true,
+    "files": [
+      "test/**/*.js"
+    ],
+    "require": [
+      "babel-register"
+    ],
+    "source": [
+      "src/**/*.js"
+    ],
+    "verbose": true
+  },
+  "browserslist": [
+    "ie >= 9"
+  ],
+  "bugs": {
+    "url": "https://github.com/planttheidea/react-idle-manager/issues"
+  },
+  "description": "A decorator for React components that notifies of idle and timed-out states",
+  "devDependencies": {
+    "ava": "^0.20.0",
+    "babel-cli": "^6.24.1",
+    "babel-core": "^6.25.0",
+    "babel-eslint": "^7.2.3",
+    "babel-loader": "^7.1.1",
+    "babel-preset-env": "^1.5.2",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "browser-env": "^3.0.2",
+    "enzyme": "^2.9.1",
+    "enzyme-to-json": "^1.5.1",
+    "eslint": "^4.1.1",
+    "eslint-config-rapid7": "^2.10.0",
+    "eslint-friendly-formatter": "^3.0.0",
+    "eslint-loader": "^1.8.0",
+    "html-webpack-plugin": "^2.29.0",
+    "in-publish": "^2.0.0",
+    "nyc": "^11.0.3",
+    "optimize-js-plugin": "^0.0.4",
+    "prop-types": "^15.5.10",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "react-redux": "^5.0.5",
+    "react-test-renderer": "^15.6.1",
+    "redux": "^3.7.1",
+    "rimraf": "^2.6.1",
+    "sinon": "^2.3.6",
+    "webpack": "^3.0.0",
+    "webpack-dashboard": "^0.4.0",
+    "webpack-dev-server": "^2.5.0"
+  },
+  "homepage": "https://github.com/planttheidea/react-idle-manager#readme",
+  "keywords": [
+    "idle",
+    "timeout",
+    "react"
+  ],
+  "license": "MIT",
+  "main": "lib/index.js",
+  "name": "react-idle-manager",
+  "peerDependencies": {
+    "react": "^15.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/planttheidea/react-idle-manager.git"
+  },
+  "scripts": {
+    "build": "NODE_ENV=development webpack --progress --colors --config=webpack/webpack.config.js",
+    "build:minified": "NODE_ENV=production webpack --progress --colors --config=webpack/webpack.config.minified.js",
+    "clean": "rimraf lib && rimraf dist",
+    "dev": "NODE_ENV=development webpack-dashboard -p 3210 -m -- webpack-dev-server --config=webpack/webpack.config.dev.js",
+    "lint": "NODE_ENV=test eslint src",
+    "lint:fix": "NODE_ENV=test eslint src --fix",
+    "prepublish": "in-publish && npm run prepublish:compile || echo",
+    "prepublish:compile": "npm run lint && npm run test:coverage && npm run clean && npm run transpile && npm run build && npm run build:minified",
+    "start": "npm run dev",
+    "test": "NODE_PATH=. NODE_ENV=test ava",
+    "test:coverage": "nyc npm test",
+    "test:update": "npm test -- --update-snapshots",
+    "test:watch": "npm test -- --watch",
+    "transpile": "babel src --out-dir lib"
+  },
+  "version": "1.0.0"
+}
