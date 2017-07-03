@@ -220,11 +220,15 @@ test('if createSetStateIfChanged will set the state if the timeoutIn has changed
 
   const result = instance.setState.firstCall.args[0]();
 
-  t.deepEqual(result, {
-    isIdle,
-    isTimedOut,
-    timeoutIn: timeoutTimestamp - now
-  });
+  t.deepEqual(Object.keys(result), [
+    'isIdle',
+    'isTimedOut',
+    'timeoutIn'
+  ]);
+
+  t.is(result.isIdle, isIdle);
+  t.is(result.isTimedOut, isTimedOut);
+  t.true(result.timeoutIn - timeoutTimestamp - now <= 10);
 });
 
 test('if createSetStateIfChanged will set the state if the isTimedOut has changed', (t) => {
