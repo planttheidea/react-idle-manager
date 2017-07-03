@@ -153,10 +153,10 @@ test('if createComponentWillUnmount will not call removeEventListener if there i
   }
 });
 
-test('if createResetTimers will update the timestamps on the instance', (t) => {
+test('if createResetTimers will update the timestamps on the instance and call setStateIfChanged', (t) => {
   const instance = {
     idleTimestamp: null,
-    setState: sinon.spy(),
+    setStateIfChanged: sinon.spy(),
     state: {
       timeoutIn: null
     },
@@ -187,57 +187,116 @@ test('if createResetTimers will update the timestamps on the instance', (t) => {
     timeoutTimestamp: options.timeOutAfter
   });
 
-  t.true(instance.setState.notCalled);
+  t.true(instance.setStateIfChanged.calledOnce);
 });
 
-test('if createResetTimers will call setState when timeoutIn is not null', (t) => {
+test('if createSetStateIfChanged will set the state if the timeoutIn has changed', (t) => {
+  const now = Date.now();
+
+  const idleTimestamp = now - 100;
+  const isIdle = true;
+  const isTimedOut = false;
+  const timeoutIn = 1000;
+  const timeoutTimestamp = now + timeoutIn + 100;
+
   const instance = {
-    idleTimestamp: null,
+    idleTimestamp,
+    timeoutTimestamp,
     setState: sinon.spy(),
     state: {
-      timeoutIn: 123
-    },
-    timeoutTimestamp: null
-  };
-  const options = {
-    idleAfter: 'idleAfter',
-    key: 'foo',
-    timeOutAfter: 'timeOutAfter'
+      isIdle,
+      isTimedOut,
+      timeoutIn
+    }
   };
 
-  const resetTimers = component.createResetTimers(instance, options);
+  const setStateIfChanged = component.createSetStateIfChanged(instance);
 
-  t.is(typeof resetTimers, 'function');
+  t.is(typeof setStateIfChanged, 'function');
 
-  const resetTimersStub = sinon.stub(utils, 'resetTimers').returns(options);
-
-  resetTimers();
-
-  t.true(resetTimersStub.calledOnce);
-  t.true(resetTimersStub.calledWith(options.key, options));
-
-  resetTimersStub.restore();
-
-  t.deepEqual(instance, {
-    ...instance,
-    idleTimestamp: options.idleAfter,
-    timeoutTimestamp: options.timeOutAfter
-  });
+  setStateIfChanged();
 
   t.true(instance.setState.calledOnce);
 
-  const setStateResult = instance.setState.firstCall.args[0]();
+  const result = instance.setState.firstCall.args[0]();
 
-  t.deepEqual(setStateResult, {
-    isIdle: false,
-    isTimedOut: false,
-    timeoutIn: null
+  t.deepEqual(result, {
+    isIdle,
+    isTimedOut,
+    timeoutIn: timeoutTimestamp - now
   });
 });
 
-test('if createSyncTimers will create a method that sets the timestamps to the values in the event passed', (t) => {
+test('if createSetStateIfChanged will set the state if the isTimedOut has changed', (t) => {
+  const now = Date.now();
+
+  const idleTimestamp = now - 100;
+  const isIdle = true;
+  const isTimedOut = false;
+  const timeoutIn = 0;
+  const timeoutTimestamp = now + timeoutIn - 100;
+
+  const instance = {
+    idleTimestamp,
+    timeoutTimestamp,
+    setState: sinon.spy(),
+    state: {
+      isIdle,
+      isTimedOut,
+      timeoutIn
+    }
+  };
+
+  const setStateIfChanged = component.createSetStateIfChanged(instance);
+
+  t.is(typeof setStateIfChanged, 'function');
+
+  setStateIfChanged();
+
+  t.true(instance.setState.calledOnce);
+
+  const result = instance.setState.firstCall.args[0]();
+
+  t.deepEqual(result, {
+    isIdle,
+    isTimedOut: true,
+    timeoutIn: 0
+  });
+});
+
+test('if createSetStateIfChanged will not set the state if nothing has changed', (t) => {
+  const now = Date.now();
+
+  const idleTimestamp = now + 1000;
+  const isIdle = false;
+  const isTimedOut = false;
+  const timeoutIn = 5000;
+  const timeoutTimestamp = now + timeoutIn;
+
+  const instance = {
+    idleTimestamp,
+    timeoutTimestamp,
+    setState: sinon.spy(),
+    state: {
+      isIdle,
+      isTimedOut,
+      timeoutIn
+    }
+  };
+
+  const setStateIfChanged = component.createSetStateIfChanged(instance);
+
+  t.is(typeof setStateIfChanged, 'function');
+
+  setStateIfChanged();
+
+  t.true(instance.setState.notCalled);
+});
+
+test('if createSyncTimers will create a method that sets the timestamps to the values in the event passed and calls setStateIfChanged', (t) => {
   const instance = {
     idleTimestamp: null,
+    setStateIfChanged: sinon.spy(),
     timeoutTimestamp: null
   };
   const options = {
@@ -265,11 +324,14 @@ test('if createSyncTimers will create a method that sets the timestamps to the v
     idleTimestamp: newValue.idleAfter,
     timeoutTimestamp: newValue.timeOutAfter
   });
+
+  t.true(instance.setStateIfChanged.calledOnce);
 });
 
 test('if createSyncTimers will not call anything if there is no event', (t) => {
   const instance = {
     idleTimestamp: null,
+    setStateIfChanged: sinon.spy(),
     timeoutTimestamp: null
   };
   const options = {
@@ -288,11 +350,14 @@ test('if createSyncTimers will not call anything if there is no event', (t) => {
   } catch (error) {
     t.fail(error);
   }
+
+  t.true(instance.setStateIfChanged.notCalled);
 });
 
 test('if createSyncTimers will not call anything if the event key is different from the options key', (t) => {
   const instance = {
     idleTimestamp: null,
+    setStateIfChanged: sinon.spy(),
     timeoutTimestamp: null
   };
   const options = {
@@ -317,13 +382,15 @@ test('if createSyncTimers will not call anything if the event key is different f
   } catch (error) {
     t.fail(error);
   }
+
+  t.true(instance.setStateIfChanged.notCalled);
 });
 
 test('if createUpdateStateIfTimerReached will create a method that sets the countdownTimeout', (t) => {
   const instance = {
     countdownTimeout: null,
     idleTimestamp: Date.now() + 1000,
-    setState: sinon.spy(),
+    setStateIfChanged: sinon.spy(),
     timeoutTimestamp: Date.now() + 2000,
     updateStateIfTimerReached: sinon.spy()
   };
@@ -344,7 +411,7 @@ test('if createUpdateStateIfTimerReached will create a method that sets the coun
 
   clearTimeoutStub.restore();
 
-  t.true(instance.setState.notCalled);
+  t.true(instance.setStateIfChanged.calledOnce);
 
   t.is(instance.countdownTimeout, timer);
 
@@ -358,7 +425,7 @@ test('if createUpdateStateIfTimerReached will set the state if is idle', (t) => 
   const instance = {
     countdownTimeout: null,
     idleTimestamp: Date.now() - 1000,
-    setState: sinon.spy(),
+    setStateIfChanged: sinon.spy(),
     timeoutTimestamp: Date.now() + 2000,
     updateStateIfTimerReached: sinon.spy()
   };
@@ -379,13 +446,7 @@ test('if createUpdateStateIfTimerReached will set the state if is idle', (t) => 
 
   clearTimeoutStub.restore();
 
-  t.true(instance.setState.calledOnce);
-
-  const setStateResult = instance.setState.firstCall.args[0]();
-
-  t.true(setStateResult.isIdle);
-  t.false(setStateResult.isTimedOut);
-  t.not(setStateResult.timeoutIn, 0);
+  t.true(instance.setStateIfChanged.calledOnce);
 
   t.is(instance.countdownTimeout, timer);
 
@@ -399,7 +460,7 @@ test('if createUpdateStateIfTimerReached will set the state if is timed out', (t
   const instance = {
     countdownTimeout: null,
     idleTimestamp: Date.now() - 2000,
-    setState: sinon.spy(),
+    setStateIfChanged: sinon.spy(),
     timeoutTimestamp: Date.now() - 1000,
     updateStateIfTimerReached: sinon.spy()
   };
@@ -420,13 +481,7 @@ test('if createUpdateStateIfTimerReached will set the state if is timed out', (t
 
   clearTimeoutStub.restore();
 
-  t.true(instance.setState.calledOnce);
-
-  const setStateResult = instance.setState.firstCall.args[0]();
-
-  t.true(setStateResult.isIdle);
-  t.true(setStateResult.isTimedOut);
-  t.is(setStateResult.timeoutIn, 0);
+  t.true(instance.setStateIfChanged.calledOnce);
 
   t.is(instance.countdownTimeout, timer);
 

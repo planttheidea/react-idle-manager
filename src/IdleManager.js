@@ -90,10 +90,6 @@ export const createResetTimers = (instance, options) => {
    */
   return () => {
     const {
-      timeoutIn
-    } = instance.state;
-
-    const {
       timeOutAfter,
       idleAfter
     } = resetTimers(options.key, options);
@@ -101,12 +97,36 @@ export const createResetTimers = (instance, options) => {
     instance.timeoutTimestamp = timeOutAfter;
     instance.idleTimestamp = idleAfter;
 
-    if (timeoutIn !== null) {
+    instance.setStateIfChanged();
+  };
+};
+
+export const createSetStateIfChanged = (instance) => {
+  /**
+   * @function setStateIfChanged
+   *
+   * @description if the state has changed, update it
+   *
+   * @param {number} [now=Date.now()] the date to be relative to
+   */
+  return () => {
+    const {
+      isTimedOut: wasTimedOut,
+      timeoutIn: previousTimeoutIn
+    } = instance.state;
+
+    const now = Date.now();
+
+    const isTimedOut = gte(now, instance.timeoutTimestamp);
+    const isIdle = gte(now, instance.idleTimestamp);
+    const timeoutIn = instance.timeoutTimestamp - now;
+
+    if (previousTimeoutIn !== timeoutIn || isTimedOut !== wasTimedOut) {
       instance.setState(() => {
         return {
-          isIdle: false,
-          isTimedOut: false,
-          timeoutIn: null
+          isIdle,
+          isTimedOut,
+          timeoutIn: gte(timeoutIn, 0) ? timeoutIn : 0
         };
       });
     }
@@ -128,6 +148,8 @@ export const createSyncTimers = (instance, options) => {
 
       instance.idleTimestamp = newValues.idleAfter;
       instance.timeoutTimestamp = newValues.timeOutAfter;
+
+      instance.setStateIfChanged();
     }
   };
 };
@@ -142,21 +164,7 @@ export const createUpdateStateIfTimerReached = (instance) => {
   return () => {
     clearTimeout(instance.updateStateIfTimerReached);
 
-    const now = Date.now();
-
-    const isTimedOut = gte(now, instance.timeoutTimestamp);
-    const isIdle = gte(now, instance.idleTimestamp);
-    const timeoutIn = instance.timeoutTimestamp - now;
-
-    if (isTimedOut || isIdle) {
-      instance.setState(() => {
-        return {
-          isIdle,
-          isTimedOut,
-          timeoutIn: gte(timeoutIn, 0) ? timeoutIn : 0
-        };
-      });
-    }
+    instance.setStateIfChanged();
 
     instance.countdownTimeout = setTimeout(instance.updateStateIfTimerReached, ONE_SECOND);
   };
@@ -193,7 +201,8 @@ export const getWrapComponent = (options) => {
 
       // instance methods
       resetTimers = createResetTimers(this, options);
-      syncTimers = createSyncTimers(this);
+      setStateIfChanged = createSetStateIfChanged(this);
+      syncTimers = createSyncTimers(this, options);
       updateStateIfTimerReached = createUpdateStateIfTimerReached(this);
 
       render() {
