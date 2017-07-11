@@ -274,8 +274,8 @@ test('if createSetStateIfChanged will not set the state if nothing has changed',
   const idleTimestamp = now + 1000;
   const isIdle = false;
   const isTimedOut = false;
-  const timeoutIn = 5000;
-  const timeoutTimestamp = now + timeoutIn;
+  const timeoutIn = null;
+  const timeoutTimestamp = now + 5000;
 
   const instance = {
     idleTimestamp,

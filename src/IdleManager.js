@@ -119,9 +119,9 @@ export const createSetStateIfChanged = (instance) => {
 
     const isTimedOut = gte(now, instance.timeoutTimestamp);
     const isIdle = gte(now, instance.idleTimestamp);
-    const timeoutIn = instance.timeoutTimestamp - now;
+    const timeoutIn = isIdle ? instance.timeoutTimestamp - now : null;
 
-    if (previousTimeoutIn !== timeoutIn || isTimedOut !== wasTimedOut) {
+    if (isTimedOut !== wasTimedOut || previousTimeoutIn !== timeoutIn) {
       instance.setState(() => {
         return {
           isIdle,

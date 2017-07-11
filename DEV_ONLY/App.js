@@ -29,6 +29,8 @@ class App extends PureComponent {
       timeoutIn
     } = this.props;
 
+    console.log(isIdle, timeoutIn);
+
     return (
       <div>
         <h1>
@@ -66,6 +68,6 @@ class App extends PureComponent {
 export default idleManager({
   idleAfter: 1000,
   key: 'planttheidea-idle-manager-demo_App',
-  timeoutAfter: 120000
+  timeOutAfter: 1200000
 })(App);
 // export default idleManager('planttheidea-idle-manager-demo_App')(App);
