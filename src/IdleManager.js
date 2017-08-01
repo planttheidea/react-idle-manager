@@ -1,23 +1,11 @@
 // external dependencies
-import React, {
-  Component,
-  PureComponent
-} from 'react';
+import React, {Component, PureComponent} from 'react';
 
 // constants
-import {
-  ONE_SECOND,
-  RESET_TIMER_EVENT_LISTENERS,
-  STORAGE_EVENT_LISTENER
-} from './constants';
+import {ONE_SECOND, RESET_TIMER_EVENT_LISTENERS, STORAGE_EVENT_LISTENER} from './constants';
 
 // utils
-import {
-  getComponentName,
-  gte,
-  hasWindow,
-  resetTimers
-} from './utils';
+import {getComponentName, getCurrentState, hasWindow, resetTimers} from './utils';
 
 /**
  * @function getInitialState
@@ -44,10 +32,7 @@ export const createComponentWillMount = (instance, options) => {
    */
   return () => {
     if (hasWindow()) {
-      const {
-        timeOutAfter,
-        idleAfter
-      } = resetTimers(options.key, options);
+      const {timeOutAfter, idleAfter} = resetTimers(options.key, options);
 
       instance.timeoutTimestamp = timeOutAfter;
       instance.idleTimestamp = idleAfter;
@@ -89,10 +74,7 @@ export const createResetTimers = (instance, options) => {
    * reset the timers and the timedOut / warned state
    */
   return () => {
-    const {
-      timeOutAfter,
-      idleAfter
-    } = resetTimers(options.key, options);
+    const {timeOutAfter, idleAfter} = resetTimers(options.key, options);
 
     instance.timeoutTimestamp = timeOutAfter;
     instance.idleTimestamp = idleAfter;
@@ -110,24 +92,13 @@ export const createSetStateIfChanged = (instance) => {
    * @param {number} [now=Date.now()] the date to be relative to
    */
   return () => {
-    const {
-      isTimedOut: wasTimedOut,
-      timeoutIn: previousTimeoutIn
-    } = instance.state;
+    const {isTimedOut: wasTimedOut, timeoutIn: previousTimeoutIn} = instance.state;
 
-    const now = Date.now();
+    const newState = getCurrentState(instance);
 
-    const isTimedOut = gte(now, instance.timeoutTimestamp);
-    const isIdle = gte(now, instance.idleTimestamp);
-    const timeoutIn = isIdle ? instance.timeoutTimestamp - now : null;
-
-    if (isTimedOut !== wasTimedOut || previousTimeoutIn !== timeoutIn) {
+    if (newState.isTimedOut !== wasTimedOut || previousTimeoutIn !== newState.timeoutIn) {
       instance.setState(() => {
-        return {
-          isIdle,
-          isTimedOut,
-          timeoutIn: gte(timeoutIn, 0) ? timeoutIn : 0
-        };
+        return newState;
       });
     }
   };
@@ -206,12 +177,7 @@ export const getWrapComponent = (options) => {
       updateStateIfTimerReached = createUpdateStateIfTimerReached(this);
 
       render() {
-        return (
-          <WrappedComponent
-            {...this.props}
-            {...this.state}
-          />
-        );
+        return <WrappedComponent {...this.props} {...this.state} />; // eslint-disable-line
       }
     };
   };

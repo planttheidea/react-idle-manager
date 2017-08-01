@@ -1,7 +1,5 @@
 // constants
-import {
-  FUNCTION_NAME_REGEXP
-} from './constants';
+import {FUNCTION_NAME_REGEXP} from './constants';
 
 /**
  * @function gte
@@ -47,6 +45,48 @@ export const getFunctionNameViaRegexp = (fn: Function): string => {
  */
 export const getComponentName = (fn: Function): string => {
   return fn.displayName || fn.name || getFunctionNameViaRegexp(fn) || 'Component';
+};
+
+/**
+ * @private
+ *
+ * @function getCurrentState
+ *
+ * @description
+ * get the current state of the instance based on its idle and timeout timestamps
+ *
+ * @param {Object|ReactComponent} instance the instance to get the current values from
+ * @returns {Object} the current state values
+ */
+export const getCurrentState = (instance) => {
+  const now = Date.now();
+
+  const isTimedOut = gte(now, instance.timeoutTimestamp);
+  const isIdle = gte(now, instance.idleTimestamp);
+  const timeoutIn = isIdle ? instance.timeoutTimestamp - now : null;
+
+  return {
+    isIdle,
+    isTimedOut,
+    timeoutIn: gte(timeoutIn, 0) ? timeoutIn : 0
+  };
+};
+
+/**
+ * @private
+ *
+ * @function getLocalStorageValues
+ *
+ * @description
+ * get the local storage values for the key provided
+ *
+ * @param {string} key the key to assign the values to
+ * @returns {null|Object} the values in local storage
+ */
+export const getLocalStorageValues = (key) => {
+  const values = window.localStorage.getItem(key);
+
+  return values ? JSON.parse(values) : values;
 };
 
 /**

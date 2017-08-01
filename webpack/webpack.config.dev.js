@@ -29,9 +29,7 @@ module.exports = Object.assign({}, defaultConfig, {
     }
   },
 
-  entry: [
-    path.join(ROOT, 'DEV_ONLY', 'index.js')
-  ],
+  entry: [path.join(ROOT, 'DEV_ONLY', 'index.js')],
 
   externals: undefined,
 

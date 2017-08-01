@@ -1,8 +1,6 @@
 // external dependencies
 import PropTypes from 'prop-types';
-import React, {
-  PureComponent
-} from 'react';
+import React, {PureComponent} from 'react';
 
 // src
 import idleManager from '../src';
@@ -22,34 +20,21 @@ class AnotherDiv extends PureComponent {
   };
 
   render() {
-    const {
-      children,
-      isIdle,
-      isTimedOut,
-      timeoutIn
-    } = this.props;
+    const {children, isIdle, isTimedOut, timeoutIn} = this.props;
 
     return (
       <div>
         {children}
 
-        {!isIdle && !isTimedOut && (
-          <div>
-            AnotherDiv is still active.
-          </div>
-        )}
+        {!isIdle && !isTimedOut && <div>AnotherDiv is still active.</div>}
 
-        {isIdle && !isTimedOut && (
+        {isIdle &&
+          !isTimedOut &&
           <div>
             AnotherDiv will timeout in {Math.ceil(timeoutIn / 1000)} seconds.
-          </div>
-        )}
+          </div>}
 
-        {isTimedOut && (
-          <div>
-            AnotherDiv has timed out.
-          </div>
-        )}
+        {isTimedOut && <div>AnotherDiv has timed out.</div>}
       </div>
     );
   }
