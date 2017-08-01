@@ -4,12 +4,20 @@
     "babel": "inherit",
     "concurrency": 5,
     "failFast": true,
-    "files": ["test/**/*.js"],
-    "require": ["babel-register"],
-    "source": ["src/**/*.js"],
+    "files": [
+      "test/**/*.js"
+    ],
+    "require": [
+      "babel-register"
+    ],
+    "source": [
+      "src/**/*.js"
+    ],
     "verbose": true
   },
-  "browserslist": ["ie >= 9"],
+  "browserslist": [
+    "ie >= 9"
+  ],
   "bugs": {
     "url": "https://github.com/planttheidea/react-idle-manager/issues"
   },
@@ -47,7 +55,11 @@
     "webpack-dev-server": "^2.6.1"
   },
   "homepage": "https://github.com/planttheidea/react-idle-manager#readme",
-  "keywords": ["idle", "timeout", "react"],
+  "keywords": [
+    "idle",
+    "timeout",
+    "react"
+  ],
   "license": "MIT",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -76,5 +88,5 @@
     "transpile:es": "BABEL_ENV=es babel src --out-dir es",
     "transpile:lib": "BABEL_ENV=lib babel src --out-dir lib"
   },
-  "version": "1.0.3"
+  "version": "1.1.0"
 }
