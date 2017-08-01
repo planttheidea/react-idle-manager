@@ -38,6 +38,27 @@ test('if getComponentName returns the name if it exists, else returns function',
   t.is(lamdaResult, 'Component');
 });
 
+test('if getCurrentState will compute the correct state based on the instance value passed', (t) => {
+  const now = Date.now();
+
+  const idleTimestamp = now - 100;
+  const timeoutIn = 1000;
+  const timeoutTimestamp = now + timeoutIn + 100;
+
+  const instance = {
+    idleTimestamp,
+    timeoutTimestamp
+  };
+
+  const result = utils.getCurrentState(instance);
+
+  t.deepEqual(Object.keys(result), ['isIdle', 'isTimedOut', 'timeoutIn']);
+
+  t.true(result.isIdle);
+  t.false(result.isTimedOut);
+  t.true(Math.abs(timeoutTimestamp - now - result.timeoutIn) <= 1);
+});
+
 test('if getFunctionNameViaRegexp will match the function name if it exists', (t) => {
   function Foo() {}
 
@@ -52,6 +73,47 @@ test('if getFunctionNameViaRegexp will match the function name if it exists', (t
   const invalidResult = utils.getFunctionNameViaRegexp('foo'); //eslint-disable-line prefer-arrow-callback
 
   t.is(invalidResult, '');
+});
+
+test.serial('if getLocalStorageValues will return null if no values are present', (t) => {
+  const currentWindow = global.window;
+  const key = 'foo';
+
+  global.window = {
+    localStorage: {
+      getItem: sinon.stub().returns(null)
+    }
+  };
+
+  const result = utils.getLocalStorageValues(key);
+
+  t.true(global.window.localStorage.getItem.calledOnce);
+  t.true(global.window.localStorage.getItem.calledWith(key));
+
+  t.is(result, null);
+
+  global.window = currentWindow;
+});
+
+test.serial('if getLocalStorageValues will return the parsed values if they are present', (t) => {
+  const currentWindow = global.window;
+  const key = 'foo';
+  const values = {bar: 'baz'};
+
+  global.window = {
+    localStorage: {
+      getItem: sinon.stub().returns(JSON.stringify(values))
+    }
+  };
+
+  const result = utils.getLocalStorageValues(key);
+
+  t.true(global.window.localStorage.getItem.calledOnce);
+  t.true(global.window.localStorage.getItem.calledWith(key));
+
+  t.deepEqual(result, values);
+
+  global.window = currentWindow;
 });
 
 test('if hasWindow will return false if no window exists', (t) => {

@@ -1,8 +1,6 @@
 // test
 import test from 'ava';
-import {
-  shallow
-} from 'enzyme';
+import {shallow} from 'enzyme';
 import toJson from 'enzyme-to-json';
 import React from 'react';
 import sinon from 'sinon';
@@ -100,39 +98,42 @@ test('if createComponentWillMount will not call addEventListener if there is no 
   }
 });
 
-test.serial('if createComponentWillUnmount will call removeEventListener on the window for the appropriate methods', (t) => {
-  const instance = {
-    resetTimers() {},
-    syncTimers() {}
-  };
+test.serial(
+  'if createComponentWillUnmount will call removeEventListener on the window for the appropriate methods',
+  (t) => {
+    const instance = {
+      resetTimers() {},
+      syncTimers() {}
+    };
 
-  const componentWillUnmount = component.createComponentWillUnmount(instance);
+    const componentWillUnmount = component.createComponentWillUnmount(instance);
 
-  t.is(typeof componentWillUnmount, 'function');
+    t.is(typeof componentWillUnmount, 'function');
 
-  const current = global.window;
+    const current = global.window;
 
-  global.window = {
-    removeEventListener: sinon.spy()
-  };
+    global.window = {
+      removeEventListener: sinon.spy()
+    };
 
-  componentWillUnmount();
+    componentWillUnmount();
 
-  const totalCount = constants.RESET_TIMER_EVENT_LISTENERS.length + 1;
+    const totalCount = constants.RESET_TIMER_EVENT_LISTENERS.length + 1;
 
-  t.is(global.window.removeEventListener.callCount, totalCount);
+    t.is(global.window.removeEventListener.callCount, totalCount);
 
-  const resetListenerArguments = constants.RESET_TIMER_EVENT_LISTENERS.map((event) => {
-    return [event, instance.resetTimers];
-  });
+    const resetListenerArguments = constants.RESET_TIMER_EVENT_LISTENERS.map((event) => {
+      return [event, instance.resetTimers];
+    });
 
-  t.deepEqual(global.window.removeEventListener.args, [
-    ...resetListenerArguments,
-    [constants.STORAGE_EVENT_LISTENER, instance.syncTimers]
-  ]);
+    t.deepEqual(global.window.removeEventListener.args, [
+      ...resetListenerArguments,
+      [constants.STORAGE_EVENT_LISTENER, instance.syncTimers]
+    ]);
 
-  global.window = current;
-});
+    global.window = current;
+  }
+);
 
 test('if createComponentWillUnmount will not call removeEventListener if there is no window', (t) => {
   const instance = {
@@ -220,11 +221,7 @@ test('if createSetStateIfChanged will set the state if the timeoutIn has changed
 
   const result = instance.setState.firstCall.args[0]();
 
-  t.deepEqual(Object.keys(result), [
-    'isIdle',
-    'isTimedOut',
-    'timeoutIn'
-  ]);
+  t.deepEqual(Object.keys(result), ['isIdle', 'isTimedOut', 'timeoutIn']);
 
   t.is(result.isIdle, isIdle);
   t.is(result.isTimedOut, isTimedOut);
@@ -505,7 +502,7 @@ test('if getWrapComponent creates a function that wraps the component in a highe
   t.is(typeof wrapComponent, 'function');
 
   function Foo() {
-    return <div/>;
+    return <div />;
   }
 
   const Result = wrapComponent(Foo);
@@ -514,9 +511,7 @@ test('if getWrapComponent creates a function that wraps the component in a highe
   t.is(Object.getPrototypeOf(Result), React.PureComponent);
   t.is(Result.displayName, 'IdleManager(Foo)');
 
-  const wrapper = shallow(
-    <Result/>
-  );
+  const wrapper = shallow(<Result />);
 
   t.is(wrapper.type(), Foo);
 
@@ -533,7 +528,7 @@ test('if getWrapComponent creates a function that wraps the component in a highe
   t.is(typeof wrapComponent, 'function');
 
   function Foo() {
-    return <div/>;
+    return <div />;
   }
 
   const Result = wrapComponent(Foo);

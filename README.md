@@ -15,6 +15,8 @@ A decorator for React components that notifies of idle and timed-out states
   * [idleAfter](#idleafter)
   * [isPure](#ispure)
   * [timeoutAfter](#timeoutafter)
+* [Utilities](#utilities)
+  * [getValues](#getvalues)
 * [Development](#development)
 
 ## Installation
@@ -129,7 +131,23 @@ The number of milliseconds since idle state was reached that the component is co
 
 Please note that if a custom `idleAfter` is provided but no custom `timeoutAfter` is provided, timeout is assumed to be 1 minute later than `idleAfter`. If you do not want a distinction between idle and timeout state, simply pass `0` as the value for `timeoutAfter`.
 
-### Development
+## utilities
+
+#### getvalues
+
+Convenience method that will retrieve the state for the key passed based on existing values. This is helpful if you want to perform an action based on the state prior to a component's mount.
+
+```javascript
+import {
+  getValues
+} from 'react-idle-manager';
+
+const currentState = getValues('planttheidea-idle-manager-demo_App');
+
+console.log(currentState); // {isIdle: true, isTimedOut: false, timeoutIn: 46}
+```
+
+## Development
 
 Standard stuff, clone the repo and `npm i` to get the dependencies. npm scripts available:
 * `build` => builds the distributed JS with `NODE_ENV=development` and with sourcemaps

@@ -2,15 +2,31 @@
 import getWrapComponent from './IdleManager';
 
 // constants
-import {
-  DEFAULT_OPTIONS,
-  INVALID_OPTIONS_ERROR_MESSAGE
-} from './constants';
+import {DEFAULT_OPTIONS, INVALID_OPTIONS_ERROR_MESSAGE} from './constants';
 
 // utils
-import {
-  isPlainObject
-} from './utils';
+import {getCurrentState, getLocalStorageValues, isPlainObject} from './utils';
+
+/**
+ * @function getValues
+ *
+ * @description
+ * get the values that currently exist for the key provided
+ *
+ * @param {string} key the key to assign the values to
+ * @returns {Object} the current state for the given key
+ */
+export const getValues = (key) => {
+  const localStorageValues = getLocalStorageValues(key);
+
+  return (
+    localStorageValues &&
+    getCurrentState({
+      idleTimestamp: localStorageValues.idleAfter,
+      timeoutTimestamp: localStorageValues.timeOutAfter
+    })
+  );
+};
 
 /**
  * @function idleManager

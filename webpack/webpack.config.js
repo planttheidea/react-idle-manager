@@ -9,9 +9,7 @@ const ROOT = path.join(__dirname, '..');
 module.exports = {
   devtool: '#source-map',
 
-  entry: [
-    path.join(ROOT, 'src', 'index.js')
-  ],
+  entry: [path.join(ROOT, 'src', 'index.js')],
 
   externals: {
     react: {
@@ -26,9 +24,7 @@ module.exports = {
     rules: [
       {
         enforce: 'pre',
-        include: [
-          path.join(ROOT, 'src')
-        ],
+        include: [path.join(ROOT, 'src')],
         loader: 'eslint-loader',
         options: {
           configFile: '.eslintrc',
@@ -37,23 +33,10 @@ module.exports = {
           formatter: eslintFriendlyFormatter
         },
         test: /\.js$/
-      }, {
-        include: [
-          path.join(ROOT, 'DEV_ONLY'),
-          path.join(ROOT, 'src')
-        ],
+      },
+      {
+        include: [path.join(ROOT, 'DEV_ONLY'), path.join(ROOT, 'src')],
         loader: 'babel-loader',
-        options: {
-          babelrc: false,
-          presets: [
-            ['env', {
-              loose: true,
-              modules: false
-            }],
-            'react',
-            'stage-2'
-          ]
-        },
         test: /\.js$/
       }
     ]
@@ -66,9 +49,5 @@ module.exports = {
     umdNamedDefine: true
   },
 
-  plugins: [
-    new webpack.EnvironmentPlugin([
-      'NODE_ENV'
-    ])
-  ]
+  plugins: [new webpack.EnvironmentPlugin(['NODE_ENV'])]
 };
