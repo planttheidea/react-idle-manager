@@ -3,12 +3,21 @@
   "ava": {
     "babel": "inherit",
     "failFast": true,
-    "files": ["test/**/*.js"],
-    "require": ["babel-register", "test/helpers/setup-environment.js"],
-    "source": ["src/**/*.js"],
+    "files": [
+      "test/**/*.js"
+    ],
+    "require": [
+      "babel-register",
+      "test/helpers/setup-environment.js"
+    ],
+    "source": [
+      "src/**/*.js"
+    ],
     "verbose": true
   },
-  "browserslist": ["ie >= 9"],
+  "browserslist": [
+    "ie >= 9"
+  ],
   "bugs": {
     "url": "https://github.com/planttheidea/react-idle-manager/issues"
   },
@@ -49,7 +58,11 @@
     "webpack-dev-server": "^2.9.1"
   },
   "homepage": "https://github.com/planttheidea/react-idle-manager#readme",
-  "keywords": ["idle", "timeout", "react"],
+  "keywords": [
+    "idle",
+    "timeout",
+    "react"
+  ],
   "license": "MIT",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -65,13 +78,11 @@
     "build": "NODE_ENV=development webpack --progress --colors --config=webpack/webpack.config.js",
     "build:minified": "NODE_ENV=production webpack --progress --colors --config=webpack/webpack.config.minified.js",
     "clean": "rimraf lib && rimraf es && rimraf dist",
-    "dev":
-      "NODE_ENV=development webpack-dashboard -p 3210 -m -- webpack-dev-server --config=webpack/webpack.config.dev.js",
+    "dev": "NODE_ENV=development webpack-dashboard -p 3210 -m -- webpack-dev-server --config=webpack/webpack.config.dev.js",
     "lint": "NODE_ENV=test eslint src",
     "lint:fix": "NODE_ENV=test eslint src --fix",
     "prepublish": "in-publish && npm run prepublish:compile || echo",
-    "prepublish:compile":
-      "npm run lint && npm run test:coverage && npm run clean && npm run transpile:lib && npm run transpile:es && npm run build && npm run build:minified",
+    "prepublish:compile": "npm run lint && npm run test:coverage && npm run clean && npm run transpile:lib && npm run transpile:es && npm run build && npm run build:minified",
     "start": "npm run dev",
     "test": "NODE_PATH=. BABEL_ENV=test ava",
     "test:coverage": "nyc npm test",
@@ -80,5 +91,5 @@
     "transpile:es": "BABEL_ENV=es babel src --out-dir es",
     "transpile:lib": "BABEL_ENV=lib babel src --out-dir lib"
   },
-  "version": "1.1.0"
+  "version": "1.1.1"
 }
