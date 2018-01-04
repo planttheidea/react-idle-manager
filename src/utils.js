@@ -2,20 +2,6 @@
 import {FUNCTION_NAME_REGEXP} from './constants';
 
 /**
- * @function gte
- *
- * @description
- * is the firstNumber greater than or equal to the secondNumber
- *
- * @param {number} firstNumber
- * @param {number} secondNumber
- * @returns {boolean}
- */
-export const gte = (firstNumber, secondNumber) => {
-  return firstNumber >= secondNumber;
-};
-
-/**
  * @private
  *
  * @function getFunctionNameViaRegexp
@@ -61,14 +47,14 @@ export const getComponentName = (fn: Function): string => {
 export const getCurrentState = (instance) => {
   const now = Date.now();
 
-  const isTimedOut = gte(now, instance.timeoutTimestamp);
-  const isIdle = gte(now, instance.idleTimestamp);
-  const timeoutIn = isIdle ? instance.timeoutTimestamp - now : null;
+  const isTimedOut = now >= instance.timeoutTimestamp;
+  const isIdle = now >= instance.idleTimestamp;
+  const timeoutIn = isIdle ? Math.max(instance.timeoutTimestamp - now, 0) : null;
 
   return {
     isIdle,
     isTimedOut,
-    timeoutIn: gte(timeoutIn, 0) ? timeoutIn : 0
+    timeoutIn
   };
 };
 
@@ -145,12 +131,12 @@ export const setLocalStorageValues = (key, values) => {
  */
 export const resetTimers = (key, options) => {
   const now = Date.now();
-  const idleAfter = now + options.idleAfter;
-  const timeOutAfter = idleAfter + options.timeOutAfter;
+  const idleTimestamp = now + options.idleAfter;
+  const timeoutTimestamp = idleTimestamp + options.timeOutAfter;
 
   const newValues = {
-    idleAfter,
-    timeOutAfter
+    idleTimestamp,
+    timeoutTimestamp
   };
 
   setLocalStorageValues(key, newValues);
