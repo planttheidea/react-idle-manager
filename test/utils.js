@@ -5,16 +5,6 @@ import sinon from 'sinon';
 // src
 import * as utils from 'src/utils';
 
-test('if gte returns true when the first number is greater than or equal to the second number, false if not', (t) => {
-  const largerNumber = 10;
-  const equalNumber = 10;
-  const smallerNumber = 5;
-
-  t.true(utils.gte(largerNumber, smallerNumber));
-  t.true(utils.gte(largerNumber, equalNumber));
-  t.false(utils.gte(smallerNumber, largerNumber));
-});
-
 test('if getComponentName returns the name if it exists, else returns function', (t) => {
   function Foo() {}
 
@@ -177,8 +167,8 @@ test.serial('if resetTimers will default now to Date.now()', (t) => {
 
   const newValues = JSON.parse(global.window.localStorage.setItem.firstCall.args[1]);
 
-  t.true(newValues.idleAfter >= now + options.idleAfter);
-  t.true(newValues.timeOutAfter >= now + options.timeOutAfter);
+  t.true(newValues.idleTimestamp >= now + options.idleAfter);
+  t.true(newValues.timeoutTimestamp >= now + options.timeOutAfter);
 
   global.window = current;
 });

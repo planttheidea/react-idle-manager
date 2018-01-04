@@ -32,10 +32,10 @@ export const createComponentWillMount = (instance, options) => {
    */
   return () => {
     if (hasWindow()) {
-      const {timeOutAfter, idleAfter} = resetTimers(options.key, options);
+      const {idleTimestamp, timeoutTimestamp} = resetTimers(options.key, options);
 
-      instance.timeoutTimestamp = timeOutAfter;
-      instance.idleTimestamp = idleAfter;
+      instance.idleTimestamp = idleTimestamp;
+      instance.timeoutTimestamp = timeoutTimestamp;
 
       instance.updateStateIfTimerReached();
 
@@ -74,10 +74,10 @@ export const createResetTimers = (instance, options) => {
    * reset the timers and the timedOut / warned state
    */
   return () => {
-    const {timeOutAfter, idleAfter} = resetTimers(options.key, options);
+    const {idleTimestamp, timeoutTimestamp} = resetTimers(options.key, options);
 
-    instance.timeoutTimestamp = timeOutAfter;
-    instance.idleTimestamp = idleAfter;
+    instance.idleTimestamp = idleTimestamp;
+    instance.timeoutTimestamp = timeoutTimestamp;
 
     instance.setStateIfChanged();
   };

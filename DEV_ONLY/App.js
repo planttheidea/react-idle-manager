@@ -26,7 +26,11 @@ class App extends PureComponent {
   render() {
     const {isIdle, isTimedOut, timeoutIn} = this.props;
 
-    console.log(isIdle, timeoutIn);
+    console.group('App');
+    console.log('isIdle', isIdle);
+    console.log('isTimedOut', isTimedOut);
+    console.log('timeoutIn', timeoutIn);
+    console.groupEnd();
 
     return (
       <div>
@@ -35,11 +39,7 @@ class App extends PureComponent {
         <div style={APP_IDLE_STYLE}>
           {!isIdle && !isTimedOut && <div>App is still active.</div>}
 
-          {isIdle &&
-            !isTimedOut &&
-            <div>
-              App will timeout in {Math.ceil(timeoutIn / 1000)} seconds.
-            </div>}
+          {isIdle && !isTimedOut && <div>App will timeout in {Math.ceil(timeoutIn / 1000)} seconds.</div>}
 
           {isTimedOut && <div>App has timed out.</div>}
         </div>
@@ -53,6 +53,6 @@ class App extends PureComponent {
 export default idleManager({
   idleAfter: 1000,
   key: APP_KEY,
-  timeOutAfter: 1200000
+  timeOutAfter: 5000
 })(App);
 // export default idleManager(APP_KEY)(App);

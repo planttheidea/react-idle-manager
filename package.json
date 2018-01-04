@@ -12,12 +12,9 @@
   "bugs": {
     "url": "https://github.com/planttheidea/react-idle-manager/issues"
   },
-  "dependencies": {
-    "react": "^15.3.0 || 16.0.0"
-  },
   "description": "A decorator for React components that notifies of idle and timed-out states",
   "devDependencies": {
-    "ava": "^0.22.0",
+    "ava": "^0.24.0",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.0.1",
@@ -38,14 +35,14 @@
     "nyc": "^11.2.1",
     "optimize-js-plugin": "^0.0.4",
     "prop-types": "^15.6.0",
-    "react-dom": "^15.3.0 || ^16.0.0",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
     "react-redux": "^5.0.6",
     "react-test-renderer": "^16.0.0",
     "redux": "^3.7.2",
     "rimraf": "^2.6.2",
     "sinon": "^4.0.0",
     "webpack": "^3.6.0",
-    "webpack-dashboard": "^0.4.0",
     "webpack-dev-server": "^2.9.1"
   },
   "homepage": "https://github.com/planttheidea/react-idle-manager#readme",
@@ -55,7 +52,7 @@
   "module": "es/index.js",
   "name": "react-idle-manager",
   "peerDependencies": {
-    "react": "^15.3.0"
+    "react": "^15.3.0 || ^16.0.0"
   },
   "repository": {
     "type": "git",
@@ -65,9 +62,8 @@
     "build": "NODE_ENV=development webpack --progress --colors --config=webpack/webpack.config.js",
     "build:minified": "NODE_ENV=production webpack --progress --colors --config=webpack/webpack.config.minified.js",
     "clean": "rimraf lib && rimraf es && rimraf dist",
-    "dev":
-      "NODE_ENV=development webpack-dashboard -p 3210 -m -- webpack-dev-server --config=webpack/webpack.config.dev.js",
-    "lint": "NODE_ENV=test eslint src",
+    "dev": "NODE_ENV=development webpack-dev-server --config=webpack/webpack.config.dev.js",
+    "lint": "NODE_ENV=test eslint src --max-warnings 0",
     "lint:fix": "NODE_ENV=test eslint src --fix",
     "prepublish": "if in-publish; then npm run prepublish:compile; fi",
     "prepublish:compile":

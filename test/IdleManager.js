@@ -173,7 +173,10 @@ test('if createResetTimers will update the timestamps on the instance and call s
 
   t.is(typeof resetTimers, 'function');
 
-  const resetTimersStub = sinon.stub(utils, 'resetTimers').returns(options);
+  const resetTimersStub = sinon.stub(utils, 'resetTimers').returns({
+    idleTimestamp: options.idleAfter,
+    timeoutTimestamp: options.timeOutAfter
+  });
 
   resetTimers();
 

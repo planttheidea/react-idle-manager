@@ -22,17 +22,19 @@ class AnotherDiv extends PureComponent {
   render() {
     const {children, isIdle, isTimedOut, timeoutIn} = this.props;
 
+    console.group('AnotherDiv');
+    console.log('isIdle', isIdle);
+    console.log('isTimedOut', isTimedOut);
+    console.log('timeoutIn', timeoutIn);
+    console.groupEnd();
+
     return (
       <div>
         {children}
 
         {!isIdle && !isTimedOut && <div>AnotherDiv is still active.</div>}
 
-        {isIdle &&
-          !isTimedOut &&
-          <div>
-            AnotherDiv will timeout in {Math.ceil(timeoutIn / 1000)} seconds.
-          </div>}
+        {isIdle && !isTimedOut && <div>AnotherDiv will timeout in {Math.ceil(timeoutIn / 1000)} seconds.</div>}
 
         {isTimedOut && <div>AnotherDiv has timed out.</div>}
       </div>
