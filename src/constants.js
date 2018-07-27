@@ -28,7 +28,7 @@ export const DEFAULT_IDLE_AFTER = DEFAULT_TIMEOUT_AFTER - ONE_MINUTE;
 export const DEFAULT_OPTIONS = {
   idleAfter: DEFAULT_IDLE_AFTER,
   isPure: true,
-  timeOutAfter: ONE_MINUTE
+  timeOutAfter: ONE_MINUTE,
 };
 
 /**
@@ -53,3 +53,9 @@ export const RESET_TIMER_EVENT_LISTENERS = ['click', 'keydown', 'mousemove', 'sc
  * @default
  */
 export const STORAGE_EVENT_LISTENER = 'storage';
+
+/**
+ * @constant {string} STORAGE_EVENT_LISTENER
+ * @default
+ */
+export const MESSAGE_EVENT_LISTENER = 'message';

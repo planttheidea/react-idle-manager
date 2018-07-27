@@ -2,10 +2,17 @@
 import getWrapComponent from './IdleManager';
 
 // constants
-import {DEFAULT_OPTIONS, INVALID_OPTIONS_ERROR_MESSAGE} from './constants';
+import {
+  DEFAULT_OPTIONS,
+  INVALID_OPTIONS_ERROR_MESSAGE
+} from './constants';
 
 // utils
-import {getCurrentState, getLocalStorageValues, isPlainObject} from './utils';
+import {
+  getCurrentState,
+  getLocalStorageValues,
+  isPlainObject
+} from './utils';
 
 /**
  * @function getValues
@@ -20,10 +27,10 @@ export const getValues = (key) => {
   const localStorageValues = getLocalStorageValues(key);
 
   return (
-    localStorageValues &&
-    getCurrentState({
+    localStorageValues
+    && getCurrentState({
       idleTimestamp: localStorageValues.idleAfter,
-      timeoutTimestamp: localStorageValues.timeOutAfter
+      timeoutTimestamp: localStorageValues.timeOutAfter,
     })
   );
 };
@@ -42,7 +49,8 @@ export const idleManager = (options) => {
   if (typeof options === 'string') {
     return getWrapComponent({
       ...DEFAULT_OPTIONS,
-      key: options
+      domain: typeof document !== 'undefined' ? document.origin : '',
+      key: options,
     });
   }
 
@@ -52,7 +60,8 @@ export const idleManager = (options) => {
 
   return getWrapComponent({
     ...DEFAULT_OPTIONS,
-    ...options
+    ...options,
+    domain: options.domain || (typeof document !== 'undefined' ? document.origin : ''),
   });
 };
 

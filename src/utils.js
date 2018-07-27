@@ -12,7 +12,7 @@ import {FUNCTION_NAME_REGEXP} from './constants';
  * @param {function} fn function to get the name of
  * @returns {string} function name
  */
-export const getFunctionNameViaRegexp = (fn: Function): string => {
+export const getFunctionNameViaRegexp = (fn) => {
   const match = fn.toString().match(FUNCTION_NAME_REGEXP);
 
   return match ? match[1] : '';
@@ -29,9 +29,7 @@ export const getFunctionNameViaRegexp = (fn: Function): string => {
  * @param {function} fn function to get the name of
  * @returns {string} function name
  */
-export const getComponentName = (fn: Function): string => {
-  return fn.displayName || fn.name || getFunctionNameViaRegexp(fn) || 'Component';
-};
+export const getComponentName = (fn) => fn.displayName || fn.name || getFunctionNameViaRegexp(fn) || 'Component';
 
 /**
  * @private
@@ -54,7 +52,7 @@ export const getCurrentState = (instance) => {
   return {
     isIdle,
     isTimedOut,
-    timeoutIn
+    timeoutIn,
   };
 };
 
@@ -83,9 +81,7 @@ export const getLocalStorageValues = (key) => {
  *
  * @returns {boolean} does the window exist
  */
-export const hasWindow = () => {
-  return typeof window !== 'undefined';
-};
+export const hasWindow = () => typeof window !== 'undefined';
 
 /**
  * @function isPlainObject
@@ -96,9 +92,7 @@ export const hasWindow = () => {
  * @param {*} object the object to test
  * @returns {boolean} is the object a plain object
  */
-export const isPlainObject = (object) => {
-  return !!object && object.constructor === Object;
-};
+export const isPlainObject = (object) => !!object && object.constructor === Object;
 
 /**
  * @function setLocalStorageValues
@@ -109,13 +103,8 @@ export const isPlainObject = (object) => {
  * @param {string} key the key to assign the values to
  * @param {Object} values the values to save
  */
-export const setLocalStorageValues = (key, values) => {
-  if (!hasWindow()) {
-    return;
-  }
-
-  window.localStorage.setItem(key, JSON.stringify(values));
-};
+export const setLocalStorageValues = (key, values) =>
+  hasWindow() && window.localStorage.setItem(key, JSON.stringify(values));
 
 /**
  * @function resetTimers
@@ -130,13 +119,11 @@ export const setLocalStorageValues = (key, values) => {
  * @returns {Object} the new values saved in storage
  */
 export const resetTimers = (key, options) => {
-  const now = Date.now();
-  const idleTimestamp = now + options.idleAfter;
-  const timeoutTimestamp = idleTimestamp + options.timeOutAfter;
+  const idleTimestamp = Date.now() + options.idleAfter;
 
   const newValues = {
     idleTimestamp,
-    timeoutTimestamp
+    timeoutTimestamp: idleTimestamp + options.timeOutAfter,
   };
 
   setLocalStorageValues(key, newValues);

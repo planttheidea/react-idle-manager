@@ -1,144 +1,126 @@
 // external dependencies
-import React, {Component, PureComponent} from 'react';
+import React from 'react';
+import {createComponent} from 'react-parm';
+import statics from 'react-statics';
+import uuid from 'uuid/v4';
 
 // constants
-import {ONE_SECOND, RESET_TIMER_EVENT_LISTENERS, STORAGE_EVENT_LISTENER} from './constants';
+import {
+  MESSAGE_EVENT_LISTENER,
+  ONE_SECOND,
+  RESET_TIMER_EVENT_LISTENERS
+} from './constants';
 
 // utils
-import {getComponentName, getCurrentState, hasWindow, resetTimers} from './utils';
+import {
+  getComponentName,
+  getCurrentState,
+  hasWindow,
+  resetTimers
+} from './utils';
 
 /**
- * @function getInitialState
+ * @constant {Object} INITIAL_STATE
+ */
+export const INITIAL_STATE = {
+  isIdle: false,
+  isTimedOut: false,
+  timeoutIn: null,
+};
+
+export const getInitialValues = (options) => () => hasWindow() && resetTimers(options.key, options);
+
+export const onConstruct = ({resetInstanceTimers, syncTimers, updateStateIfTimerReached}) => {
+  if (hasWindow()) {
+    updateStateIfTimerReached(false);
+
+    RESET_TIMER_EVENT_LISTENERS.forEach((event) => {
+      window.addEventListener(event, resetInstanceTimers);
+    });
+
+    window.addEventListener(MESSAGE_EVENT_LISTENER, syncTimers);
+  }
+};
+
+export const componentWillUnmount = ({resetInstanceTimers, syncTimers}) => {
+  if (hasWindow()) {
+    RESET_TIMER_EVENT_LISTENERS.forEach((event) => {
+      window.removeEventListener(event, resetInstanceTimers);
+    });
+
+    window.removeEventListener(MESSAGE_EVENT_LISTENER, syncTimers);
+  }
+};
+
+export const resetInstanceTimers = (options) => (instance) => {
+  const {idleTimestamp, timeoutTimestamp} = resetTimers(options.key, options);
+
+  instance.idleTimestamp = idleTimestamp;
+  instance.timeoutTimestamp = timeoutTimestamp;
+
+  instance.setStateIfChanged(true);
+};
+
+export const setStateIfChanged = (options) => (instance, [shouldNotify]) => {
+  const {
+    setState,
+    state: {isTimedOut: wasTimedOut, timeoutIn: previousTimeoutIn},
+  } = instance;
+
+  const newState = getCurrentState(instance);
+
+  return (
+    (newState.isTimedOut !== wasTimedOut || previousTimeoutIn !== newState.timeoutIn)
+    && setState(() => {
+      if (shouldNotify) {
+        window.postMessage(
+          JSON.stringify({
+            idleTimestamp: instance.idleTimestamp,
+            timeoutTimestamp: instance.timeoutTimestamp,
+            windowId: instance.windowId,
+          }),
+          options.domain
+        );
+      }
+
+      return newState;
+    })
+  );
+};
+
+export const syncTimers = (options) => (instance, [event]) => {
+  const {data, origin} = event;
+
+  try {
+    const message = JSON.parse(data);
+
+    if (origin === options.domain && message && message.windowId && message.windowId !== instance.windowId) {
+      instance.idleTimestamp = message.idleTimestamp;
+      instance.timeoutTimestamp = message.timeoutTimestamp;
+
+      instance.setStateIfChanged(false);
+    }
+  } catch (error) {
+    // nothing
+  }
+};
+
+/**
+ * @function updateStateIfTimerReached
  *
  * @description
- * get the initial state of the component
+ * check if the timed out / warned state has been reached and if so update the state
  *
- * @returns {object} the initial state of the instance
+ * @param {boolean} [shouldUpdateState=true] should the state be updated
  */
-export const getInitialState = () => {
-  return {
-    isIdle: false,
-    isTimedOut: false,
-    timeoutIn: null
-  };
-};
+export const updateStateIfTimerReached = (instance, [shouldUpdateState = true]) => {
+  clearTimeout(instance.countdownTimeout);
 
-export const createComponentWillMount = (instance, options) => {
-  /**
-   * @function componentWillMount
-   *
-   * @description
-   * on mount, update the timer and add the even listeners for resetting the timer
-   */
-  return () => {
-    if (hasWindow()) {
-      const {idleTimestamp, timeoutTimestamp} = resetTimers(options.key, options);
+  if (shouldUpdateState) {
+    instance.setStateIfChanged(true);
+  }
 
-      instance.idleTimestamp = idleTimestamp;
-      instance.timeoutTimestamp = timeoutTimestamp;
-
-      instance.updateStateIfTimerReached();
-
-      RESET_TIMER_EVENT_LISTENERS.forEach((event) => {
-        window.addEventListener(event, instance.resetTimers);
-      });
-
-      window.addEventListener(STORAGE_EVENT_LISTENER, instance.syncTimers);
-    }
-  };
-};
-
-export const createComponentWillUnmount = (instance) => {
-  /**
-   * @function componentWillUnmount
-   *
-   * @description
-   * pprior to unmount, remove the even listeners for resetting the timer
-   */
-  return () => {
-    if (hasWindow()) {
-      RESET_TIMER_EVENT_LISTENERS.forEach((event) => {
-        window.removeEventListener(event, instance.resetTimers);
-      });
-
-      window.removeEventListener(STORAGE_EVENT_LISTENER, instance.syncTimers);
-    }
-  };
-};
-
-export const createResetTimers = (instance, options) => {
-  /**
-   * @function resetTimers
-   *
-   * @description
-   * reset the timers and the timedOut / warned state
-   */
-  return () => {
-    const {idleTimestamp, timeoutTimestamp} = resetTimers(options.key, options);
-
-    instance.idleTimestamp = idleTimestamp;
-    instance.timeoutTimestamp = timeoutTimestamp;
-
-    instance.setStateIfChanged();
-  };
-};
-
-export const createSetStateIfChanged = (instance) => {
-  /**
-   * @function setStateIfChanged
-   *
-   * @description if the state has changed, update it
-   *
-   * @param {number} [now=Date.now()] the date to be relative to
-   */
-  return () => {
-    const {isTimedOut: wasTimedOut, timeoutIn: previousTimeoutIn} = instance.state;
-
-    const newState = getCurrentState(instance);
-
-    if (newState.isTimedOut !== wasTimedOut || previousTimeoutIn !== newState.timeoutIn) {
-      instance.setState(() => {
-        return newState;
-      });
-    }
-  };
-};
-
-export const createSyncTimers = (instance, options) => {
-  /**
-   * @function syncTimers
-   *
-   * @description
-   * when the storage event is fired, update the instance values if the key matches
-   *
-   * @param {StorageEvent} event the storage event fired by the browser
-   */
-  return (event) => {
-    if (event && event.key === options.key) {
-      const newValues = JSON.parse(event.newValue);
-
-      instance.idleTimestamp = newValues.idleAfter;
-      instance.timeoutTimestamp = newValues.timeOutAfter;
-
-      instance.setStateIfChanged();
-    }
-  };
-};
-
-export const createUpdateStateIfTimerReached = (instance) => {
-  /**
-   * @function updateStateIfTimerReached
-   *
-   * @description
-   * check if the timed out / warned state has been reached and if so update the state
-   */
-  return () => {
-    clearTimeout(instance.updateStateIfTimerReached);
-
-    instance.setStateIfChanged();
-
-    instance.countdownTimeout = setTimeout(instance.updateStateIfTimerReached, ONE_SECOND);
-  };
+  instance.countdownTimeout = setTimeout(instance.updateStateIfTimerReached, ONE_SECOND);
 };
 
 /**
@@ -151,36 +133,25 @@ export const createUpdateStateIfTimerReached = (instance) => {
  * @param {Object} options the options passed to the component
  * @returns {function(ReactComponent): ReactComponent} the decorator function returning the wrapping component
  */
-export const getWrapComponent = (options) => {
-  const ComponentToExtend = options.isPure ? PureComponent : Component;
-
-  return (WrappedComponent) => {
-    return class IdleManager extends ComponentToExtend {
-      static displayName = `IdleManager(${getComponentName(WrappedComponent)})`;
-
-      // state
-      state = getInitialState(this, options);
-
-      // lifecycle methods
-      componentWillMount = createComponentWillMount(this, options);
-      componentWillUnmount = createComponentWillUnmount(this);
-
-      // instance values
-      countdownTimeout = null;
-      idleTimestamp = null;
-      timeoutTimestamp = null;
-
-      // instance methods
-      resetTimers = createResetTimers(this, options);
-      setStateIfChanged = createSetStateIfChanged(this);
-      syncTimers = createSyncTimers(this, options);
-      updateStateIfTimerReached = createUpdateStateIfTimerReached(this);
-
-      render() {
-        return <WrappedComponent {...this.props} {...this.state} />; // eslint-disable-line
-      }
-    };
-  };
-};
+export const getWrapComponent = (options) => (WrappedComponent) =>
+  statics({
+    displayName: `IdleManager(${getComponentName(WrappedComponent)})`,
+  })(
+    createComponent((props, {state}) => <WrappedComponent {...props} {...state} />, {
+      componentWillUnmount,
+      countdownTimeout: null,
+      getInitialValues,
+      idleTimestamp: null,
+      isPure: options.isPure,
+      onConstruct,
+      resetInstanceTimers: resetInstanceTimers(options),
+      setStateIfChanged: setStateIfChanged(options),
+      state: INITIAL_STATE,
+      syncTimers: syncTimers(options),
+      timeoutTimestamp: null,
+      updateStateIfTimerReached,
+      windowId: uuid(),
+    })
+  );
 
 export default getWrapComponent;
