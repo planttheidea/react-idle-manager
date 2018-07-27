@@ -1,6 +1,6 @@
 // external dependencies
-import PropTypes from 'prop-types';
-import React, {PureComponent} from 'react';
+import PropTypes from '../../../Library/Caches/typescript/2.9/node_modules/@types/prop-types';
+import React, {PureComponent} from '../../../Library/Caches/typescript/2.9/node_modules/@types/react';
 
 // components
 import AnotherDiv from './AnotherDiv';
@@ -18,17 +18,15 @@ console.log(getValues(APP_KEY));
 
 class App extends PureComponent {
   static propTypes = {
-    idleIn: PropTypes.number.isRequired,
     isIdle: PropTypes.bool.isRequired,
     isTimedOut: PropTypes.bool.isRequired,
-    timeoutIn: PropTypes.number.isRequired,
+    timeoutIn: PropTypes.number,
   };
 
   render() {
-    const {idleIn, isIdle, isTimedOut, timeoutIn} = this.props;
+    const {isIdle, isTimedOut, timeoutIn} = this.props;
 
     console.group('App');
-    console.log('idleIn', idleIn);
     console.log('isIdle', isIdle);
     console.log('isTimedOut', isTimedOut);
     console.log('timeoutIn', timeoutIn);
@@ -53,8 +51,7 @@ class App extends PureComponent {
 }
 
 export default idleManager({
-  idleAfter: 2000,
-  // isDisabled: true,
+  idleAfter: 1000,
   key: APP_KEY,
   timeOutAfter: 5000,
 })(App);

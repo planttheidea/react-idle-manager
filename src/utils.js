@@ -1,5 +1,42 @@
+// external dependencies
+import cookies from 'browser-cookies';
+
 // constants
-import {FUNCTION_NAME_REGEXP} from './constants';
+import {
+  DEFAULT_OPTIONS,
+  FUNCTION_NAME_REGEXP
+} from './constants';
+
+export const getExistingCookieValues = (key) => JSON.parse(cookies.get(key) || '{}');
+
+export const getCalculatedNewState = (options, state) => {
+  const now = Date.now();
+
+  const {idleTimestamp = state.idleTimestamp, timeoutTimestamp = state.timeoutTimestamp} = getExistingCookieValues(
+    options.key
+  );
+
+  return {
+    idleIn: Math.max(idleTimestamp - now, 0),
+    idleTimestamp,
+    isIdle: now >= idleTimestamp,
+    isTimedOut: now >= timeoutTimestamp,
+    timeoutIn: Math.max(timeoutTimestamp - now, 0),
+    timeoutTimestamp,
+  };
+};
+
+export const getCalculatedTimestamps = (options) => {
+  const {idleAfter = DEFAULT_OPTIONS.idleAfter, timeOutAfter = DEFAULT_OPTIONS.timeOutAfter} = options;
+  const now = Date.now();
+
+  return {
+    idleAfter,
+    idleTimestamp: now + idleAfter,
+    timeOutAfter,
+    timeoutTimestamp: now + idleAfter + timeOutAfter,
+  };
+};
 
 /**
  * @private
@@ -31,102 +68,50 @@ export const getFunctionNameViaRegexp = (fn) => {
  */
 export const getComponentName = (fn) => fn.displayName || fn.name || getFunctionNameViaRegexp(fn) || 'Component';
 
-/**
- * @private
- *
- * @function getCurrentState
- *
- * @description
- * get the current state of the instance based on its idle and timeout timestamps
- *
- * @param {Object|ReactComponent} instance the instance to get the current values from
- * @returns {Object} the current state values
- */
-export const getCurrentState = (instance) => {
-  const now = Date.now();
+export const getDefaultOptions = (options) => ({
+  ...DEFAULT_OPTIONS,
+  ...options,
+});
 
-  const isTimedOut = now >= instance.timeoutTimestamp;
-  const isIdle = now >= instance.idleTimestamp;
-  const timeoutIn = isIdle ? Math.max(instance.timeoutTimestamp - now, 0) : null;
+export const setCookieValues = (options, {idleTimestamp, openWindows, timeoutTimestamp}, increaseWindows) => {
+  const {openWindows: existingOpenWindows = 0} = getExistingCookieValues(options.key);
+
+  cookies.set(
+    options.key,
+    JSON.stringify({
+      idleTimestamp,
+      openWindows: openWindows || (increaseWindows ? existingOpenWindows + 1 : existingOpenWindows),
+      timeoutTimestamp,
+    }),
+    options.storageOptions
+  );
+};
+
+export const getFreshState = (options, increaseWindows = false) => {
+  const {idleAfter, idleTimestamp, timeOutAfter, timeoutTimestamp} = getCalculatedTimestamps(options);
+
+  setCookieValues(
+    options,
+    {
+      idleTimestamp,
+      timeoutTimestamp,
+    },
+    increaseWindows
+  );
 
   return {
-    isIdle,
-    isTimedOut,
-    timeoutIn,
-  };
-};
-
-/**
- * @private
- *
- * @function getLocalStorageValues
- *
- * @description
- * get the local storage values for the key provided
- *
- * @param {string} key the key to assign the values to
- * @returns {null|Object} the values in local storage
- */
-export const getLocalStorageValues = (key) => {
-  const values = window.localStorage.getItem(key);
-
-  return values ? JSON.parse(values) : values;
-};
-
-/**
- * @function hasWindow
- *
- * @description
- * does the window exist
- *
- * @returns {boolean} does the window exist
- */
-export const hasWindow = () => typeof window !== 'undefined';
-
-/**
- * @function isPlainObject
- *
- * @description
- * is the object passed a plain object
- *
- * @param {*} object the object to test
- * @returns {boolean} is the object a plain object
- */
-export const isPlainObject = (object) => !!object && object.constructor === Object;
-
-/**
- * @function setLocalStorageValues
- *
- * @description
- * set the values passed in local storage
- *
- * @param {string} key the key to assign the values to
- * @param {Object} values the values to save
- */
-export const setLocalStorageValues = (key, values) =>
-  hasWindow() && window.localStorage.setItem(key, JSON.stringify(values));
-
-/**
- * @function resetTimers
- *
- * @description
- * reset the timers to new values based on the current datetime
- *
- * @param {string} key the key to assign the values to
- * @param {Object} options the options passed to the component instance
- * @param {number} options.timeOutAfter the amount of milliseconds to wait before timing out
- * @param {number} options.idleAfter the amount of milliseconds to wait before warning of impending out
- * @returns {Object} the new values saved in storage
- */
-export const resetTimers = (key, options) => {
-  const idleTimestamp = Date.now() + options.idleAfter;
-
-  const newValues = {
+    idleIn: idleAfter,
     idleTimestamp,
-    timeoutTimestamp: idleTimestamp + options.timeOutAfter,
+    isIdle: false,
+    isTimedOut: false,
+    timeoutIn: idleAfter + timeOutAfter,
+    timeoutTimestamp,
   };
-
-  setLocalStorageValues(key, newValues);
-
-  return newValues;
 };
+
+export const shouldSetState = (newState, existingState) =>
+  newState.isIdle
+    ? !existingState.isIdle
+      || newState.isTimedOut !== existingState.isTimedOut
+      || newState.timeoutIn !== existingState.timeoutIn
+    : existingState.isIdle;
