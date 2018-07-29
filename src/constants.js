@@ -1,34 +1,18 @@
 /**
- * @constant {number} ONE_SECOND
- * @default
+ * @constant {string} BEFORE_UNLOAD
  */
-export const ONE_SECOND = 1000;
-
-/**
- * @constant {number} ONE_MINUTE
- * @default
- */
-export const ONE_MINUTE = ONE_SECOND * 60;
-
-/**
- * @constant {number} DEFAULT_TIMEOUT_AFTER
- * @default
- */
-export const DEFAULT_TIMEOUT_AFTER = ONE_MINUTE * 15;
-
-/**
- * @constant {number} DEFAULT_IDLE_AFTER
- * @default
- */
-export const DEFAULT_IDLE_AFTER = DEFAULT_TIMEOUT_AFTER - ONE_MINUTE;
+export const BEFORE_UNLOAD = 'beforeunload';
 
 /**
  * @constant {Object} DEFAULT_OPTIONS
  */
 export const DEFAULT_OPTIONS = {
-  idleAfter: DEFAULT_IDLE_AFTER,
-  isPure: true,
-  timeOutAfter: ONE_MINUTE
+  idleAfter: 840000,
+  isPure: false,
+  isScoped: false,
+  pollInterval: 1000,
+  resetTimerEvents: ['click', 'keydown', 'mousemove', 'scroll'],
+  timeoutAfter: 60000,
 };
 
 /**
@@ -37,19 +21,6 @@ export const DEFAULT_OPTIONS = {
 export const FUNCTION_NAME_REGEXP = /^\s*function\s+([^\(\s]*)\s*/;
 
 /**
- * @constant {string} INVALID_OPTIONS_ERROR_MESSAGE
- * @default
+ * @constant {function} getNow
  */
-export const INVALID_OPTIONS_ERROR_MESSAGE =
-  'When using idleManager, you must pass either a string key or an object of options.';
-
-/**
- * @constant {Array<string>} RESET_TIMER_EVENT_LISTENERS
- */
-export const RESET_TIMER_EVENT_LISTENERS = ['click', 'keydown', 'mousemove', 'scroll'];
-
-/**
- * @constant {string} STORAGE_EVENT_LISTENER
- * @default
- */
-export const STORAGE_EVENT_LISTENER = 'storage';
+export const getNow = Date.now;

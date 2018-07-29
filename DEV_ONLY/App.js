@@ -11,22 +11,27 @@ import idleManager, {getValues} from '../src';
 const APP_KEY = 'planttheidea-idle-manager-demo_App';
 const APP_IDLE_STYLE = {
   border: '1px solid black',
-  marginBottom: 15
+  marginBottom: 15,
 };
 
 console.log(getValues(APP_KEY));
+console.log(getValues('foo'));
+
+setTimeout(() => console.log(getValues(APP_KEY)), 1000);
 
 class App extends PureComponent {
   static propTypes = {
+    idleIn: PropTypes.number.isRequired,
     isIdle: PropTypes.bool.isRequired,
     isTimedOut: PropTypes.bool.isRequired,
-    timeoutIn: PropTypes.number
+    timeoutIn: PropTypes.number.isRequired,
   };
 
   render() {
-    const {isIdle, isTimedOut, timeoutIn} = this.props;
+    const {idleIn, isIdle, isTimedOut, timeoutIn} = this.props;
 
     console.group('App');
+    console.log('idleIn', idleIn);
     console.log('isIdle', isIdle);
     console.log('isTimedOut', isTimedOut);
     console.log('timeoutIn', timeoutIn);
@@ -51,8 +56,17 @@ class App extends PureComponent {
 }
 
 export default idleManager({
-  idleAfter: 1000,
+  idleAfter: 2000,
+  // isDisabled: true,
   key: APP_KEY,
-  timeOutAfter: 5000
+  // resetTimerEvents: ['click'],
+  storageOptions: {
+    // domain: '.localhost',
+    expires: 1,
+    // httponly: true,
+    // samesite: 'Strict',
+    // secure: true,
+  },
+  timeoutAfter: 5000,
 })(App);
 // export default idleManager(APP_KEY)(App);

@@ -6,9 +6,10 @@ import React, {PureComponent} from 'react';
 import idleManager from '../src';
 
 const IDLE_MANAGER_OPTIONS = {
-  key: 'planttheidea-idle-manager-demo_AnotherDiv',
   idleAfter: 7000,
-  timeOutAfter: 3000
+  isScoped: true,
+  key: 'planttheidea-idle-manager-demo_AnotherDiv',
+  timeoutAfter: 3000,
 };
 
 class AnotherDiv extends PureComponent {
@@ -16,7 +17,7 @@ class AnotherDiv extends PureComponent {
     children: PropTypes.node,
     isIdle: PropTypes.bool.isRequired,
     isTimedOut: PropTypes.bool.isRequired,
-    timeoutIn: PropTypes.number
+    timeoutIn: PropTypes.number,
   };
 
   render() {
