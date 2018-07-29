@@ -2,11 +2,12 @@
  * @constant {Object} DEFAULT_OPTIONS
  */
 export const DEFAULT_OPTIONS = {
-  idleAfter: 14000,
+  idleAfter: 840000,
+  isPure: false,
   isScoped: false,
   pollInterval: 1000,
   resetTimerEvents: ['click', 'keydown', 'mousemove', 'scroll'],
-  timeOutAfter: 1000,
+  timeoutAfter: 60000,
 };
 
 /**

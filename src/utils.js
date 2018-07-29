@@ -58,20 +58,20 @@ export const getCalculatedNewState = (
  *
  * @param {Object} options the options passed to the decorator
  * @param {number} [options.idleAfter=DEFAULT_OPTIONS.idleAfter] the number of ms to wait before being idle
- * @param {number} [options.timeOutAfter=DEFAULT_OPTIONS.timeOutAfter] the number of ms to wait before being timedout
+ * @param {number} [options.timeoutAfter=DEFAULT_OPTIONS.timeoutAfter] the number of ms to wait before being timedout
  * @returns {Object} the calculated timestamps object
  */
 export const getCalculatedTimestamps = ({
   idleAfter = DEFAULT_OPTIONS.idleAfter,
-  timeOutAfter = DEFAULT_OPTIONS.timeOutAfter,
+  timeoutAfter = DEFAULT_OPTIONS.timeoutAfter,
 }) => {
   const now = Date.now();
 
   return {
     idleAfter,
     idleTimestamp: now + idleAfter,
-    timeOutAfter,
-    timeoutTimestamp: now + idleAfter + timeOutAfter,
+    timeoutAfter,
+    timeoutTimestamp: now + idleAfter + timeoutAfter,
   };
 };
 
@@ -149,7 +149,7 @@ export const setCookieValues = ({key, storageOptions}, {idleTimestamp, timeoutTi
  * @returns {Object} the refreshed state values
  */
 export const getFreshState = (options) => {
-  const {idleAfter, idleTimestamp, timeOutAfter, timeoutTimestamp} = getCalculatedTimestamps(options);
+  const {idleAfter, idleTimestamp, timeoutAfter, timeoutTimestamp} = getCalculatedTimestamps(options);
 
   setCookieValues(options, {
     idleTimestamp,
@@ -161,7 +161,7 @@ export const getFreshState = (options) => {
     idleTimestamp,
     isIdle: false,
     isTimedOut: false,
-    timeoutIn: idleAfter + timeOutAfter,
+    timeoutIn: idleAfter + timeoutAfter,
     timeoutTimestamp,
   };
 };

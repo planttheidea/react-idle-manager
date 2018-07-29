@@ -15,6 +15,7 @@ const APP_IDLE_STYLE = {
 };
 
 console.log(getValues(APP_KEY));
+console.log(getValues('foo'));
 
 setTimeout(() => console.log(getValues(APP_KEY)), 1000);
 
@@ -66,6 +67,6 @@ export default idleManager({
     // samesite: 'Strict',
     // secure: true,
   },
-  timeOutAfter: 5000,
+  timeoutAfter: 5000,
 })(App);
 // export default idleManager(APP_KEY)(App);

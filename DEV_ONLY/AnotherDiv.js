@@ -9,7 +9,7 @@ const IDLE_MANAGER_OPTIONS = {
   idleAfter: 7000,
   isScoped: true,
   key: 'planttheidea-idle-manager-demo_AnotherDiv',
-  timeOutAfter: 3000,
+  timeoutAfter: 3000,
 };
 
 class AnotherDiv extends PureComponent {

@@ -17,6 +17,8 @@ import {
   setCookieValues
 } from './utils';
 
+const {hasOwnProperty} = Object.prototype;
+
 export const createGetInitialState = (options) =>
   /**
    * @function getInitialState
@@ -112,9 +114,18 @@ export const createSetStateIfChanged = (options) =>
 export const idleManager = (passedOptions) => {
   const options = getNormalizedOptions(typeof passedOptions === 'string' ? {key: passedOptions} : passedOptions);
 
-  if (!Object.prototype.hasOwnProperty.call(options, 'key')) {
+  if (!hasOwnProperty.call(options, 'key')) {
     throw ReferenceError(
       'You must pass either the unique key or an object of options that contains the key to the method.'
+    );
+  }
+
+  if (hasOwnProperty.call(options, 'timeOutAfter')) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `The option "timeOutAfter" has been changed to "timeoutAfter", please check the options related to key "${
+        options.key
+      }".`
     );
   }
 
@@ -136,6 +147,7 @@ export const idleManager = (passedOptions) => {
           componentWillUnmount,
           element: null,
           getInitialState: createGetInitialState(options),
+          isPure: options.isPure,
           setStateIfChanged: createSetStateIfChanged(options),
         }
       )
