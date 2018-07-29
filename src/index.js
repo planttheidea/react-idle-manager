@@ -2,8 +2,8 @@
 import {idleManager} from './idleManager';
 
 // utils
-import {getExistingCookieValues} from './utils';
+import {getExistingCookieValues as getValues} from './utils';
 
-export const getValues = (key) => getExistingCookieValues(key);
+export {getValues};
 
 export default idleManager;

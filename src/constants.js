@@ -1,3 +1,6 @@
+/**
+ * @constant {Object} DEFAULT_OPTIONS
+ */
 export const DEFAULT_OPTIONS = {
   idleAfter: 14000,
   isScoped: false,

@@ -16,6 +16,8 @@ const APP_IDLE_STYLE = {
 
 console.log(getValues(APP_KEY));
 
+setTimeout(() => console.log(getValues(APP_KEY)), 1000);
+
 class App extends PureComponent {
   static propTypes = {
     idleIn: PropTypes.number.isRequired,
@@ -56,6 +58,14 @@ export default idleManager({
   idleAfter: 2000,
   // isDisabled: true,
   key: APP_KEY,
+  // resetTimerEvents: ['click'],
+  storageOptions: {
+    // domain: '.localhost',
+    expires: 1,
+    // httponly: true,
+    // samesite: 'Strict',
+    // secure: true,
+  },
   timeOutAfter: 5000,
 })(App);
 // export default idleManager(APP_KEY)(App);
