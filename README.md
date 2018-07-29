@@ -18,6 +18,7 @@ A decorator for React components that notifies of idle and timed-out states
   - [isScoped](#isscoped)
   - [pollInterval](#pollinterval)
   - [resetTimerEvents](#resettimerevents)
+  - [storageOptions](#storageoptions)
   - [timeoutAfter](#timeoutafter)
 - [Utilities](#utilities)
   - [getValues](#getvalues)
@@ -152,6 +153,33 @@ The number of milliseconds to poll for external changes to stored idle timeout v
 `Array<string>` (defaults to `['click', 'keydown', 'mousemove', 'scroll']`)
 
 The events to add listeners for that will reset the idle state timer internally.
+
+#### storageOptions
+
+`Object`
+
+The options to pass through to the cookie manager when storing the values. This can be used for more secure usage, for allowing sharing across multiple subdomains, or more fine-grained implementation.
+
+The shape of the options available:
+
+```javascript
+{
+  // the domain from where the cookie is readable
+  domain: string = '',
+  // when the cookie will expire
+  expires: (Date|number|string) = 0,
+  // is the cookie only able to be read by the server
+  httponly: boolean = false,
+  // the path where the cookie is readable from
+  path: string = '/',
+  // SameSite setting for if the cookie should be sent with CORS requests
+  samesite: string = '',
+  // is the cookie only usable on secure protocols like https
+  secure: boolean = false,
+}
+```
+
+For more detailed information, including valid values and support limitations for certain options, [check the cookie manager documentation](https://github.com/voltace/browser-cookies#options).
 
 #### timeoutAfter
 
