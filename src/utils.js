@@ -4,7 +4,8 @@ import cookies from 'browser-cookies';
 // constants
 import {
   DEFAULT_OPTIONS,
-  FUNCTION_NAME_REGEXP
+  FUNCTION_NAME_REGEXP,
+  getNow
 } from './constants';
 
 /**
@@ -38,7 +39,7 @@ export const getCalculatedNewState = (
   const {idleTimestamp = currentIdleTimestamp, timeoutTimestamp = currentTimeoutTimestamp} = getExistingCookieValues(
     key
   );
-  const now = Date.now();
+  const now = getNow();
 
   return {
     idleIn: Math.max(idleTimestamp - now, 0),
@@ -65,7 +66,7 @@ export const getCalculatedTimestamps = ({
   idleAfter = DEFAULT_OPTIONS.idleAfter,
   timeoutAfter = DEFAULT_OPTIONS.timeoutAfter,
 }) => {
-  const now = Date.now();
+  const now = getNow();
 
   return {
     idleAfter,

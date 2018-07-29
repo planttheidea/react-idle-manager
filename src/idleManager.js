@@ -7,6 +7,9 @@ import {
   createElementRef
 } from 'react-parm';
 
+// constants
+import {BEFORE_UNLOAD} from './constants';
+
 // utils
 import {
   getCalculatedNewState,
@@ -56,27 +59,35 @@ export const createComponentDidMount = (options) =>
       (isScoped && element ? element : window).addEventListener(event, setStateIfChanged)
     );
 
-    window.addEventListener('beforeunload', componentWillUnmount);
+    window.addEventListener(BEFORE_UNLOAD, componentWillUnmount);
   };
 
-/**
- * @function componentWillUnmount
- *
- * @description
- * prior to unmount, either reduce the number of open windows or remove the cookie entirely
- *
- * @param {ReactComponent} instance the component instance
- */
-export const componentWillUnmount = (instance) => {
-  const {componentWillUnmount, intervalId} = instance;
+export const createComponentWillUnmount = (options) =>
+  /**
+   * @function componentWillUnmount
+   *
+   * @description
+   * prior to unmount, either reduce the number of open windows or remove the cookie entirely
+   *
+   * @param {ReactComponent} instance the component instance
+   */
+  (instance) => {
+    const {componentWillUnmount, intervalId, setStateIfChanged} = instance;
+    const {isDisabled, isScoped, resetTimerEvents} = options;
 
-  window.removeEventListener('beforeunload', componentWillUnmount);
+    if (isDisabled) {
+      return;
+    }
 
-  clearInterval(intervalId);
+    resetTimerEvents.forEach((event) => !isScoped && window.removeEventListener(event, setStateIfChanged));
 
-  // eslint-disable-next-line no-param-reassign
-  instance.intervalId = null;
-};
+    window.removeEventListener(BEFORE_UNLOAD, componentWillUnmount);
+
+    clearInterval(intervalId);
+
+    // eslint-disable-next-line no-param-reassign
+    instance.intervalId = null;
+  };
 
 export const createSetStateIfChanged = (options) =>
   /**
@@ -144,7 +155,7 @@ export const idleManager = (passedOptions) => {
         ),
         {
           componentDidMount: createComponentDidMount(options),
-          componentWillUnmount,
+          componentWillUnmount: createComponentWillUnmount(options),
           element: null,
           getInitialState: createGetInitialState(options),
           isPure: options.isPure,

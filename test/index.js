@@ -1,111 +1,58 @@
 // test
 import test from 'ava';
+import cookies from 'browser-cookies';
 import sinon from 'sinon';
 
 // src
 import * as index from 'src/index';
 import * as constants from 'src/constants';
-import * as getWrapComponent from 'src/IdleManager';
+import * as idleManager from 'src/idleManager';
 import * as utils from 'src/utils';
+import {getExistingCookieValues} from '../src/utils';
 
-test.serial('if getValues returns null if getLocalStorageValues returns null', (t) => {
-  const key = 'foo';
-  const localStorageValues = null;
-  const currentStateValues = {bar: 'baz'};
+test('if the default export is idleMananger', (t) => {
+  t.is(index.default, idleManager.idleManager);
+});
 
-  const getLocalStorageValuesStub = sinon.stub(utils, 'getLocalStorageValues').returns(localStorageValues);
-  const getCurrentStateStub = sinon.stub(utils, 'getCurrentState').returns(JSON.stringify(currentStateValues));
+test('if getValues will return null if the key does not exist', (t) => {
+  const key = 'key';
+
+  const state = {some: 'state'};
+  const cookiesStub = sinon.stub(cookies, 'get').returns(null);
+  const getStateStub = sinon.stub(utils, 'getCalculatedNewState').returns(state);
 
   const result = index.getValues(key);
 
-  t.true(getLocalStorageValuesStub.calledOnce);
-  t.true(getLocalStorageValuesStub.calledWith(key));
+  t.true(cookiesStub.calledOnce);
+  t.true(cookiesStub.calledWith(key));
 
-  t.true(getCurrentStateStub.notCalled);
+  cookiesStub.restore();
 
-  t.is(result, localStorageValues);
+  t.true(getStateStub.notCalled);
 
-  getLocalStorageValuesStub.restore();
-  getCurrentStateStub.restore();
+  getStateStub.restore();
+
+  t.is(result, null);
 });
 
-test.serial('if getValues returns the current state if getLocalStorageValues returns values', (t) => {
-  const key = 'foo';
-  const now = Date.now();
+test('if getValues will return the state if the key exists', (t) => {
+  const key = 'key';
 
-  const localStorageValues = {
-    idleAfter: now + 1000,
-    timeOutAfter: now + 2000
-  };
-  const currentStateValues = {bar: 'baz'};
-
-  const getLocalStorageValuesStub = sinon
-    .stub(utils, 'getLocalStorageValues')
-    .returns(JSON.stringify(localStorageValues));
-  const getCurrentStateStub = sinon.stub(utils, 'getCurrentState').returns(currentStateValues);
+  const state = {some: 'state'};
+  const cookiesStub = sinon.stub(cookies, 'get').returns(JSON.stringify(state));
+  const getStateStub = sinon.stub(utils, 'getCalculatedNewState').returns(state);
 
   const result = index.getValues(key);
 
-  t.true(getLocalStorageValuesStub.calledOnce);
-  t.true(getLocalStorageValuesStub.calledWith(key));
+  t.true(cookiesStub.calledTwice);
+  t.deepEqual(cookiesStub.args, [[key], [key]]);
 
-  t.true(getCurrentStateStub.calledOnce);
+  cookiesStub.restore();
 
-  t.is(result, currentStateValues);
+  t.true(getStateStub.calledOnce);
+  t.deepEqual(getStateStub.args[0], [{key}, state]);
 
-  getLocalStorageValuesStub.restore();
-  getCurrentStateStub.restore();
-});
+  getStateStub.restore();
 
-test('if idleManager is the same as the default export', (t) => {
-  t.is(typeof index.idleManager, 'function');
-  t.is(index.idleManager, index.default);
-});
-
-test('if idleManager will call getWrapComponent with the default options with the key when options is a string', (t) => {
-  const options = 'foo';
-
-  const getWrapComponentStub = sinon.stub(getWrapComponent, 'default');
-
-  index.idleManager(options);
-
-  t.true(getWrapComponentStub.calledOnce);
-  t.deepEqual(getWrapComponentStub.firstCall.args, [
-    {
-      ...constants.DEFAULT_OPTIONS,
-      key: options
-    }
-  ]);
-
-  getWrapComponentStub.restore();
-});
-
-test('if idleManager will call getWrapComponent with the merged options when options is an object', (t) => {
-  const options = {
-    foo: 'bar'
-  };
-
-  const getWrapComponentStub = sinon.stub(getWrapComponent, 'default');
-
-  index.idleManager(options);
-
-  t.true(getWrapComponentStub.calledOnce);
-  t.deepEqual(getWrapComponentStub.firstCall.args, [
-    {
-      ...constants.DEFAULT_OPTIONS,
-      ...options
-    }
-  ]);
-
-  getWrapComponentStub.restore();
-});
-
-test('if idleManager will throw an error when options is not a string or plain object', (t) => {
-  const options = 123;
-
-  const error = t.throws(() => {
-    index.idleManager(options);
-  }, TypeError);
-
-  t.is(error.message, constants.INVALID_OPTIONS_ERROR_MESSAGE);
+  t.deepEqual(result, state);
 });

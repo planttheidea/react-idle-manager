@@ -1,4 +1,9 @@
 /**
+ * @constant {string} BEFORE_UNLOAD
+ */
+export const BEFORE_UNLOAD = 'beforeunload';
+
+/**
  * @constant {Object} DEFAULT_OPTIONS
  */
 export const DEFAULT_OPTIONS = {
@@ -14,3 +19,8 @@ export const DEFAULT_OPTIONS = {
  * @constant {RegExp} FUNCTION_NAME_REGEXP
  */
 export const FUNCTION_NAME_REGEXP = /^\s*function\s+([^\(\s]*)\s*/;
+
+/**
+ * @constant {function} getNow
+ */
+export const getNow = Date.now;
