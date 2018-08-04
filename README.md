@@ -11,6 +11,7 @@ A decorator for React components that notifies of idle and timed-out states
   - [isIdle](#isidle)
   - [isTimedOut](#istimedout)
   - [timeoutIn](#timeoutin)
+  - [updateIdleManagerOptions](#updateidlemanageroptions)
 - [Configuration](#configuration)
   - [key](#key)
   - [idleAfter](#idleafter)
@@ -99,6 +100,19 @@ _number_: The number of milliseconds until the component will time out.
 
 - The number of milliseconds may not update in exact intervals compared to `configuration.pollInterval` due to the nature of `setTimeout`.
   - If you want to provide a clean count of the number of seconds, you can do something like `Math.ceil(timeoutIn / 1000)`.
+
+#### updateIdleManagerOptions
+
+_function(Object)_: A method to dynamically update all options passed in the decorator (except for the `key`).
+
+```javascript
+this.props.updateIdleManagerOptions({
+  idleAfter: 1000 * 60 * 5,
+  timeoutAfter: 1000 * 30
+});
+```
+
+- This method is also available on the component instance retrieved via `ref`.
 
 ## Configuration
 

@@ -25,7 +25,14 @@ class App extends PureComponent {
     isIdle: PropTypes.bool.isRequired,
     isTimedOut: PropTypes.bool.isRequired,
     timeoutIn: PropTypes.number.isRequired,
+    updateIdleManagerOptions: PropTypes.func.isRequired,
   };
+
+  componentDidMount() {
+    this.props.updateIdleManagerOptions({
+      idleAfter: 10000,
+    });
+  }
 
   render() {
     const {idleIn, isIdle, isTimedOut, timeoutIn} = this.props;
