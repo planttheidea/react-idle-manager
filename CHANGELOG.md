@@ -1,4 +1,9 @@
-# redux-browser-storage CHANGELOG
+# react-idle-manager CHANGELOG
+
+## 2.1.0
+
+- Add [`updateIdleManagerOptions`](README.md#updateidlemanageroptions) prop to allow dynamic updates of manager options
+- Fix issue where `cookies.erase` was not being called with `storageOptions`
 
 ## 2.0.0
 
