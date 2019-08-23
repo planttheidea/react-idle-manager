@@ -5,7 +5,7 @@ import cookies from 'browser-cookies';
 import {
   DEFAULT_OPTIONS,
   FUNCTION_NAME_REGEXP,
-  getNow
+  getNow,
 } from './constants';
 
 /**

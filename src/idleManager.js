@@ -4,7 +4,7 @@ import React from 'react';
 import statics from 'react-statics';
 import {
   createComponent,
-  createElementRef
+  createElementRef,
 } from 'react-parm';
 
 // constants
@@ -17,7 +17,7 @@ import {
   getFreshState,
   getNormalizedOptions,
   shouldSetState,
-  setCookieValues
+  setCookieValues,
 } from './utils';
 
 const {hasOwnProperty} = Object.prototype;

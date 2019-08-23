@@ -7,7 +7,7 @@ import {idleManager} from './idleManager';
 // utils
 import {
   getCalculatedNewState,
-  getExistingCookieValues
+  getExistingCookieValues,
 } from './utils';
 
 /**
